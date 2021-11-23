@@ -50,7 +50,66 @@ utst <- lizards %>%
 
 remember can use `unique` with $ to see what is actually left
 
+## Find counts and proportions of lizards with broken or whole tails at each site (side blotched only)
+
 ```{r}
+utst %>% 
+  count(site, tail)  # not a super pretty table, lets fix it to be tidy
+
+# could also use pivot wider
+```
+
+use the `janitor` package with the `tabyl()` function and the `adorn_percentages()` function
+easier to compare across groups than long table formats
+
+```{r}
+tail_counts <- utst %>% 
+  janitor::tabyl(site, tail)
+
+tail_proportions <- tail_counts %>% 
+  adorn_percentages() %>%  # note default is to calculate proportions by rows 
+  adorn_pct_formatting(digits = 2) %>%  # and update digits
+  adorn_ns() # and add sample size
+
+# but nice to have one table with both - nice way to compare proportions and sample size
+# could update with kableExtra to be super pretty 
 
 ```
+
+
+### is there a significant association in broken tails by sites?
+
+first need to clean up the table so that it converts the first column into row names 
+this will give us a contingency table with just the numbers ready to analyze
+
+## Convert to contingency table
+
+Use `column to rowname()`
+then we're left with just contingency values, which is what we want to analye
+
+```{r}
+lizard_ct <- tail_counts %>% 
+  column_to_rownames(var = "site")  # different than normal syntax for variable
+
+```
+
+## run a chi-square
+
+Q: are tail breakage and site independent?  
+is there a significant association between these variables?
+would assume tail breakage proportion to be same across site; null hypothesis of independence 
+
+```{r}
+lizard_x2 <- chisq.test(lizard_ct)
+lizard_x2
+
+lizard_tidy <- tidy(lizard_x2) # this makes it easier to refer in line referencing!
+```
+
+degrees of freedom = number or rows-1 * number of columns-1
+yes, we have enough information to reject the null hypothesis
+significant association between tail breakage and site
+site and lizard tail breakage are not independent
+
+There is a significant association (i.e., non-independence) between site and lizard tail breakage ($\chi$^2^(`r lizard_tidy$parameter`) = `r round(lizard_tidy$statistic,2)`, *p* = `r round(lizard_tidy$p.value, 3)`).
 
