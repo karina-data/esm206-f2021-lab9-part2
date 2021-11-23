@@ -1,0 +1,56 @@
+---
+title: 'Lab 6 - Part 2: Chi-Square w/lizards tail'
+author: "Karina Johnston"
+date: "11/23/2021"
+output: 
+  html_document: 
+    theme: cerulean
+---
+
+```{r setup, include=FALSE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+# attach packages
+library(tidyverse)
+library(janitor)
+library(broom)
+library(here)
+```
+
+## Read in the data
+
+```{r}
+lizards <- read_csv(here("data", "lizards.csv"))
+```
+
+Find the counts by species, what are most common lizards
+
+```{r}
+lizards %>% 
+  count(spp) %>% 
+  arrange(-n)  # this will change arrangement to list high to low
+```
+
+Found most common was UTST (side-blotched)
+
+## Make a subset of the data
+
+Question relating to tail condition 
+
+- UTST lizards
+- sites: IBPE (enclosure grassland), RABB (rabbit mesquite), "EAST" (east tarbush)
+- tail condition is recorded (W = whole, B = broken)
+
+```{r}
+utst <- lizards %>%
+  filter(spp == "UTST") %>% 
+  filter(site %in% c("IBPE", "RABB", "EAST")) %>% 
+  filter(tail %in% c("B", "W"))
+```
+
+remember can use `unique` with $ to see what is actually left
+
+```{r}
+
+```
+
